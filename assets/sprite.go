@@ -51,6 +51,7 @@ func (s *spriteSheet) Get(index int) (*ebiten.Image, error) {
 
 	// Convert 1-based index to 0-based row and column
 	index -= 1
+
 	row := index / s.cols
 	col := index % s.cols
 	//fmt.Printf("Get Sprite: Position (%d,%d)\n", row, col)

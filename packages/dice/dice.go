@@ -129,9 +129,9 @@ func (d *dieImpl) Roll() (int, *ebiten.Image) {
 	face := rand.Intn(d.sides)
 	d.lastRoll = face + 1
 	spriteStart := d.diceType.SpriteStart()
-	spriteIndex := face + spriteStart - 1
-	fmt.Printf("Rolling %s: value: %d,getSprite: %d\n", d.diceType.String(), d.lastRoll, spriteStart)
-	img, err := d.sheet.Get(spriteIndex)
+	spriteOffset := face
+	fmt.Printf("Rolling %s: value: %d,spriteStart: %d, getSprite: %d\n", d.diceType.String(), d.lastRoll, spriteStart, spriteStart+spriteOffset)
+	img, err := d.sheet.Get(spriteStart + spriteOffset)
 	if err != nil {
 		return face, nil
 	}
@@ -146,19 +146,24 @@ func (d *dieImpl) Set(face int) (*ebiten.Image, error) {
 	if face <= 0 || face > d.sides {
 		return nil, fmt.Errorf("face value %d is out of range for %s", face, d.diceType)
 	}
-
+	spriteOffset := face
 	d.lastRoll = face + 1
-	img, err := d.sheet.Get(face + d.diceType.SpriteStart())
+	img, err := d.sheet.Get(face + d.diceType.SpriteStart() + spriteOffset)
 	return img, err
 
 }
 
 // Roll will select a random number and return it, and the image associated with it.
 func (d *dieImpl) LastRoll() (int, *ebiten.Image) {
-	img, err := d.sheet.Get(d.lastRoll + d.diceType.SpriteStart())
+
+	roleValue := d.lastRoll - 1
+	if roleValue < 0 {
+		roleValue = 0
+	}
+	img, err := d.sheet.Get(d.diceType.SpriteStart() + roleValue)
 	if err != nil {
 		return d.lastRoll, nil
 	}
 
-	return d.lastRoll + 1, img
+	return d.lastRoll, img
 }
